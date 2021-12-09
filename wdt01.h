@@ -15,15 +15,14 @@ typedef enum {
     WDT_OFF, WDT_8MS, WDT_16MS, WDT_32MS,
     WDT_64MS, WDT_128MS, WDT_256MS, WDT_512MS, 
     WDT_1S, WDT_2S, WDT_4S, WDT_8S
-} WDT_Period_t;
+} WDT_period_t;
 
 //--------------------------------------------
 //  set period only
 //--------------------------------------------
-SI void wdt_period(WDT_Period_t e) {
-    while (WDT.STATUS);
-    _PROTECTED_WRITE( WDT.CTRLA, e );
-
+SI void wdt_period( WDT_period_t e ) {
+    while( WDT.STATUS & 1 ){}          //check SYNCBUSY
+    _PROTECTED_WRITE( WDT.CTRLA, e );  //WINDOW=0|PERIOD
 }
 
 //--------------------------------------------
@@ -33,18 +32,18 @@ SI void wdt_period(WDT_Period_t e) {
 //  until it times out, followed by the period
 //  timer which requires wdr before timeout
 //--------------------------------------------
-SI void wdt_window(WDT_Period_t window, WDT_Period_t period) {
-    while (WDT.STATUS);
+SI void wdt_window( WDT_period_t window, WDT_period_t period ) {
+    while ( WDT.STATUS & 1 ){}         //check SYNCBUSY
     uint8_t v = (window<<4)|period;
-    _PROTECTED_WRITE( WDT.CTRLA, v );
+    _PROTECTED_WRITE( WDT.CTRLA, v );  //WINDOW|PERIOD
 }
 
 //--------------------------------------------
-//  lock wdt (locked until reset)
+//  lock wdt (can only set LOCK, so will be
+//            locked until reset)
 //--------------------------------------------
 SI void wdt_lock() {
-    while (WDT.STATUS);
-    _PROTECTED_WRITE( WDT.STATUS, 0x80 );
+    _PROTECTED_WRITE( WDT.STATUS, 0x80 ); //set LOCK
 }
 
 //--------------------------------------------
