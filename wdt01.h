@@ -1,7 +1,15 @@
 #pragma once
-//AVR0/1 wdt.h replacement
-//can put in same folder as wdt.h
-//then use #include <avr/wdt01.h>
+
+//--------------------------------------------
+//  AVR0/1 wdt.h replacement
+//  can put in same folder as wdt.h
+//  then use #include <avr/wdt01.h>
+//
+//  if the WDTCFG fuse is not 0, then the
+//  watchdog LOCK bit will be set so none of 
+//  the below functions will have any effect, 
+//  except for wdt_restart()
+//--------------------------------------------
 
 #include <avr/io.h>
 #include <stdint.h>
@@ -47,8 +55,8 @@ SI void wdt_lock() {
 }
 
 //--------------------------------------------
-//  reset wd counter
+//  restart (reset) wd counter
 //--------------------------------------------
-SI void wdt_reset(){ asm("wdr"); }
+SI void wdt_restart(){ asm("wdr"); }
 
 #undef SI
